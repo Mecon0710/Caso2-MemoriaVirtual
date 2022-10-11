@@ -4,7 +4,7 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Map;
 
-public class Envejecimiento extends Thread{
+public class Envejecimiento extends Thread {
 	
 	 private Map<Integer, ArrayList<Integer>> paginas;
 	

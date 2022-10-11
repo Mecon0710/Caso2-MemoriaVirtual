@@ -1,5 +1,8 @@
 package Solucion;
 
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.Map;
 import java.util.Scanner;
 
 public class Main {
@@ -7,7 +10,7 @@ public class Main {
     private final static int T_TLB = 2;
     private final static int T_TP = 30;
     private final static int T_DATOS_RAM = 30;
-    private final static int T_FALLA_PAG = 4;
+    private final static int T_FALLA_PAG = 60;
     private final static int T_SOL_FALLA_PAG = 10;
     
     
@@ -31,24 +34,32 @@ public class Main {
         nombre_archivo = input.toString();
         
         input.close();
+
+        ArrayList<Integer> refPaginas = new ArrayList<Integer>();
+		Map<Integer, ArrayList<Integer>> memReal = new HashMap<Integer, ArrayList<Integer>>();
+		Map<Integer, Integer> TP = new HashMap<Integer, Integer>();
+		Map<Integer, Integer> TLB = new HashMap<Integer, Integer>();
         
-        Referencia ref = new Referencia();
+        Admin admin = new Admin(refPaginas, memReal, TP, TLB);
         
         
         if (nombre_archivo.equals("Alta")) {
         	
-        	ref.cargarDatosAlta();
+        	admin.cargarDatosAlta();
         
         }
         else if (nombre_archivo.equals("Baja")) {
         	
-        	ref.cargarDatosBaja();
+        	admin.cargarDatosBaja();
         }
         else {
         	
         	System.out.println(nombre_archivo + " no es una respuesta valida");
         }
-        
+
+        //se inicializan la memoria real y la TLB
+        admin.crearMemRealTP(numMP);
+        admin.crearTLB(numTLB);
         
         
     }
