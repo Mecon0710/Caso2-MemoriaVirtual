@@ -18,7 +18,7 @@ public class Main {
     private static int numMP;
     private static String nombre_archivo;
     
-    private Referencia ref;
+    private Admin ref;
 
     public static void main(String[] args) throws Exception{
     	
@@ -35,13 +35,16 @@ public class Main {
         
         input.close();
 
-        ArrayList<Integer> refPaginas = new ArrayList<Integer>();
-		Map<Integer, ArrayList<Integer>> memReal = new HashMap<Integer, ArrayList<Integer>>();
-		Map<Integer, Integer> TP = new HashMap<Integer, Integer>();
+        //ArrayList<Integer> refPaginas = new ArrayList<Integer>();
+		int[] memReal = new int[numMP];
+		int[] TP = new int[64];
 		Map<Integer, Integer> TLB = new HashMap<Integer, Integer>();
+        Integer falloPag = new Integer(-1);
+        Object dormidor = new Object();
+
+        Admin admin = new Admin(memReal, TP, TLB, dormidor, falloPag);
         
-        Admin admin = new Admin(refPaginas, memReal, TP, TLB);
-        
+        // Pasar falloPag al constructor de Envejecimiento
         
         if (nombre_archivo.equals("Alta")) {
         	

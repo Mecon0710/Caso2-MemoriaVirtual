@@ -6,33 +6,75 @@ import java.util.HashMap;
 import java.util.Map;
 import java.util.Scanner;
 
+import javax.tools.Diagnostic;
+
 public class Admin extends Thread {
 	
 	// estos son los datos ya leidos
 	private ArrayList<Integer> refPaginas;
 
 	// num de marcos en memoria principal
-	private int memReal;
+	private int[] memReal;
 
 	// Tabla de páginas y TLB
-	private Map<Integer, Integer> TP;
+	private int[] TP;
 	private Map<Integer, Integer> TLB;
+
+	private Integer falloPagina;
 	
-	public Admin() {
+	public Admin(int[] memReal, int[] TP, Map<Integer, Integer> TLB, Object dormidor, Integer falloPag) {
 	
 		this.memReal = memReal;
 		this.TP = TP;
 		this.TLB = TLB;
-		
+		this.falloPagina = falloPag;
+		ArrayList<Integer> refPaginas = new ArrayList<Integer>();
+		ArrayList<Integer> falloPagina = new ArrayList<Integer>();
 	}
 
 	public void crearTLB(int entradasTLB) {
 		for(int i = 0; i < entradasTLB; i ++) {
-			TLB.put(i,TP.get(i));
+			TLB.put(i,TP[i]);
 		}
 
 	}
 	
+	public void crearTP () {
+		for (int j = 0; j < TP.length; j++) {
+			TP[j] = -1;
+		}
+	
+		for (int i = 0; i < memReal.length; i++) {
+			
+			if (TP[refPaginas.get(i)]== -1 && memReal[i] == 0) { 
+
+				TP[refPaginas.get(i)] = i;
+				memReal[i] = 1;
+				try {
+
+					sleep(2);
+
+				} catch (Exception e) {
+
+				}
+				
+			}
+		}
+
+		for (int i = memReal.length; i < TP.length; i++) {
+
+			if (TP[refPaginas.get(i)]== -1){
+
+				falloPagina = i;
+			
+				dormidor.notify(); // despertar a envejecimiento
+				// dormir a admin por medio de envejecimiento 
+			}
+			
+		}
+
+	}
+
 	// public void crearMemRealTP(int mp) {
 		
 	// 	int capacidad = Math.round(64/mp);
