@@ -14,7 +14,7 @@ public class Admin extends Thread {
 	private ArrayList<Integer> refPaginas;
 
 	// num de marcos en memoria principal
-	private Map<Integer, Long> memReal;
+	private Map<Long, Long> memRealRef;
 
 	// Tabla de páginas y TLB
 	private Map<Integer, Integer> TP;
@@ -22,9 +22,9 @@ public class Admin extends Thread {
 
 	private int num_falloPagina;
 	
-	public Admin(Map<Integer, Long> memReal, Map<Integer, Integer> TP, int[] TLB, int falloPag) {
+	public Admin(Map<Long, Long> memReal, Map<Integer, Integer> TP, int[] TLB, int falloPag) {
 	
-		this.memReal = memReal;
+		this.memRealRef = memReal;
 		this.TP = TP;
 		this.TLB = TLB;
 		this.num_falloPagina = falloPag;
@@ -49,9 +49,9 @@ public class Admin extends Thread {
 			TP[j] = -1;
 		}
 	
-		for (int i = 0; i < memReal.length; i++) {
+		for (int i = 0; i < memRealRef.length; i++) {
 			
-			if (TP[refPaginas.get(i)]== -1 && memReal[i] == 0) { 
+			if (TP[refPaginas.get(i)]== -1 && memRealRef[i] == 0) { 
 
 				TP[refPaginas.get(i)] = i;
 				memReal[i] = 1;
@@ -66,7 +66,7 @@ public class Admin extends Thread {
 			}
 		}
 
-		for (int i = memReal.length; i < TP.length; i++) {
+		for (int i = memRealRef.length; i < TP.length; i++) {
 
 			if (TP[refPaginas.get(i)]== -1){
 
@@ -125,8 +125,8 @@ public class Admin extends Thread {
                    
 	}
 	
-	public Map<Integer, Long> getMemReal() {
-		return memReal;
+	public Map<Long, Long> getMemRealRef() {
+		return memRealRef;
 	}
 
 	

@@ -36,10 +36,11 @@ public class Main {
         input.close();
 
         // Creación de estructuras de memoria real, tabla de páginas y TLB
-		Map<Integer, Long> memReal = new HashMap<Integer, Long>();
+		Map<Long, Long> memReal = new HashMap<Long, Long>();
             for(int i = 0; i < numMP; i++){
-                memReal.put(-1, (long) 0);
+                memReal.put((long) -1, (long) 0);
             }
+            
 		Map<Integer, Integer> TP = new HashMap<Integer, Integer>();
 		int[] TLB = new int[numTLB];
         int num_falloPag = 0;
