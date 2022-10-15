@@ -6,12 +6,19 @@ import java.util.Map;
 
 public class Envejecimiento extends Thread {
 	
-	 private Map<Integer, ArrayList<Integer>> paginas;
+	 private Map<Integer, Long> memoriaReal;
+
+	private Admin admin;
 	
 	 public Envejecimiento() {
 			
-		 Map<Integer, ArrayList<Integer>> paginas = new HashMap<Integer, ArrayList<Integer>>();
+		 Map<Integer, Long> memoriaReal = admin.getMemReal();
 		 
 		}
+	//Obtiene la memoria real
+	//Hace el corrimiento de todas las paginas que hay en memoria real (marcos)
 
+	public Map<Integer, Long> getMemoriaReal() {
+		return memoriaReal;
+	}
 }

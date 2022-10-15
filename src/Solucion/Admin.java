@@ -14,32 +14,37 @@ public class Admin extends Thread {
 	private ArrayList<Integer> refPaginas;
 
 	// num de marcos en memoria principal
-	private int[] memReal;
+	private Map<Integer, Long> memReal;
 
 	// Tabla de páginas y TLB
-	private int[] TP;
-	private Map<Integer, Integer> TLB;
+	private Map<Integer, Integer> TP;
+	private int[] TLB;
 
-	private Integer falloPagina;
+	private int num_falloPagina;
 	
-	public Admin(int[] memReal, int[] TP, Map<Integer, Integer> TLB, Object dormidor, Integer falloPag) {
+	public Admin(Map<Integer, Long> memReal, Map<Integer, Integer> TP, int[] TLB, int falloPag) {
 	
 		this.memReal = memReal;
 		this.TP = TP;
 		this.TLB = TLB;
-		this.falloPagina = falloPag;
+		this.num_falloPagina = falloPag;
 		ArrayList<Integer> refPaginas = new ArrayList<Integer>();
-		ArrayList<Integer> falloPagina = new ArrayList<Integer>();
 	}
 
-	public void crearTLB(int entradasTLB) {
+	public void actualizarTLB(int entradasTLB) {
+		//Busca si hay espacio en la TLB
+		//Si hay espacio agrega la pagina
+		//Si no hay espacio elimina el valor que esta en la posicion 0 y coloca la pagina
 		for(int i = 0; i < entradasTLB; i ++) {
 			TLB.put(i,TP[i]);
 		}
 
 	}
 	
-	public void crearTP () {
+	public void actualizarTP () {
+		//Actualiza el valor de la pagina con el marco de página
+	
+
 		for (int j = 0; j < TP.length; j++) {
 			TP[j] = -1;
 		}
@@ -75,33 +80,19 @@ public class Admin extends Thread {
 
 	}
 
-	// public void crearMemRealTP(int mp) {
+	public void crearMemReal(int mp) {
 		
-	// 	int capacidad = Math.round(64/mp);
-		
-	// 	for (int i = 0; i < refPaginas.size(); i++) {
-			
-	// 		int j = capacidad - (i + 1);
-	// 		int pagina = refPaginas.get(i);
-			
-	// 		if (marcoPagina.size() < capacidad && !marcoPagina.contains(pagina)){
-				
-	// 			marcoPagina.add(pagina);
-				
-	// 		}
-	// 		else if (marcoPagina.size() > capacidad) {
-				
-	// 			memReal.put(j, marcoPagina);
-				
-	// 			for (int m = 0; m < marcoPagina.size(); m++) {
-					
-	// 				int pag = marcoPagina.get(m);
-	// 				TP.put(pag, j);
-	// 			}
-	// 		}
-			
-	// 	}
-	// }
+		//Llama al getter de envejecimiento para obtener la memoria real 
+		//Coge la primera referencia 
+		//Mira si esta en TLB
+		//Mira si esta en TP
+		//Hay fallo de pagina
+		//Mira si hay espacio en la memoria real
+		//Si no hay espacio busca la pagina de menor valor, la elimina y remplazamos la pagina y ponemos el valor en 0s
+		//Pone el 1 a la izquierda de la pagina que entro
+		//Llama a las funciones de actualizacion de la TLB (pagina) y TP (entrada -> pagina, marco de pagina)
+		//Elimina la referencia de la lista refpaginas
+	}
 	
 	public void cargarDatosBaja() throws Exception {
 		
@@ -134,6 +125,9 @@ public class Admin extends Thread {
                    
 	}
 	
+	public Map<Integer, Long> getMemReal() {
+		return memReal;
+	}
 
 	
 }

@@ -7,6 +7,7 @@ import java.util.Scanner;
 
 public class Main {
 
+    //Tiempos
     private final static int T_TLB = 2;
     private final static int T_TP = 30;
     private final static int T_DATOS_RAM = 30;
@@ -18,7 +19,6 @@ public class Main {
     private static int numMP;
     private static String nombre_archivo;
     
-    private Admin ref;
 
     public static void main(String[] args) throws Exception{
     	
@@ -35,16 +35,18 @@ public class Main {
         
         input.close();
 
-        //ArrayList<Integer> refPaginas = new ArrayList<Integer>();
-		int[] memReal = new int[numMP];
-		int[] TP = new int[64];
-		Map<Integer, Integer> TLB = new HashMap<Integer, Integer>();
-        Integer falloPag = new Integer(-1);
-        Object dormidor = new Object();
+        // Creación de estructuras de memoria real, tabla de páginas y TLB
+		Map<Integer, Long> memReal = new HashMap<Integer, Long>();
+            for(int i = 0; i < numMP; i++){
+                memReal.put(-1, (long) 0);
+            }
+		Map<Integer, Integer> TP = new HashMap<Integer, Integer>();
+		int[] TLB = new int[numTLB];
+        int num_falloPag = 0;
 
-        Admin admin = new Admin(memReal, TP, TLB, dormidor, falloPag);
+        Admin admin = new Admin(memReal, TP, TLB, num_falloPag);
         
-        // Pasar falloPag al constructor de Envejecimiento
+        // Carga de datos
         
         if (nombre_archivo.equals("Alta")) {
         	
@@ -61,8 +63,8 @@ public class Main {
         }
 
         //se inicializan la memoria real y la TLB
-        admin.crearMemRealTP(numMP);
-        admin.crearTLB(numTLB);
+        //admin.crearMemRealTP(numMP);
+        //admin.crearTLB(numTLB);
         
         
     }
