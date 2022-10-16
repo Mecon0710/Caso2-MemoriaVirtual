@@ -41,7 +41,7 @@ public class Main {
 
 		Map<Long, Long> memReal = new HashMap<Long, Long>();
         for(int i = 0; i < numMP; i++){
-            int j = -1*i;
+            int j = -1*(i+1);
             memReal.put((long) j, (long) 0);
         }
 

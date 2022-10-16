@@ -23,31 +23,27 @@ public class Envejecimiento extends Thread {
 	//Obtiene la memoria real
 	//Hace el corrimiento de todas las paginas que hay en memoria real (marcos)
 
-	public Map<Long, Long> getMemRealEnvej() {
-		return memRealEnvej;
+	@Override
+	public void run() {
+		corrimiento();
+		try {
+			sleep(1);
+		} catch (InterruptedException e) {
+			e.printStackTrace();
+		}
 	}
 
 	public void corrimiento(){
-		synchronized (mutex){
-		Set<Long> paginas = memRealEnvej.keySet();
-		Iterator iter = paginas.iterator(); 
-		Long nuevo = (long) 0;
-
-		if (rBits.length != 64){
-			for(int i = 0; i < memRealEnvej.size(); i++){
-				nuevo = memRealEnvej.get(iter.next());
-				nuevo = nuevo >> 1;
-				memRealEnvej.replace((Long) iter.next(), nuevo);
-			}
-		} else {
-			for(int i = 0; i < memRealEnvej.size(); i++){
-				int llave = (int) iter.next();
-
-				if (rBits[llave] == 0){
+		synchronized (memRealEnvej) {
+			Set<Long> paginas = memRealEnvej.keySet();
+			Iterator iter = paginas.iterator(); 
+			Long nuevo = (long) 0;
+			for(int i = 0; i < memRealEnvej.size(); i++) {
+				long llave = (long) iter.next();
+				if (llave >= 0 && rBits[(int)llave] == 0){
 					nuevo = memRealEnvej.get((long)llave);
 					nuevo = nuevo >> 1;
-					memRealEnvej.replace((Long) iter.next(), nuevo);
-					}
+					memRealEnvej.replace((Long) llave, nuevo);
 				}
 			}
 		}

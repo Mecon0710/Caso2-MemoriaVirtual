@@ -1,2 +1,0 @@
-TamanioMemoriaReal; TamanioTLB; TiempoEnProcesar; NumeroDeFalloDePaginas 
-8; 4; 10000060; 1

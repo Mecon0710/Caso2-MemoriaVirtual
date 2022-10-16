@@ -133,6 +133,12 @@ public class Admin extends Thread {
 		} catch (IOException e) {
 			e.printStackTrace();
 		}
+
+		try {
+			sleep(2);
+		} catch (InterruptedException e) {
+			e.printStackTrace();
+		}
 		// 1. Leer referencia de refPaginas YA
 		// 2. Revisa si está en TLB	YA
 			// 2.si: Se registra el tiempo de acceso a la TLB	YA	
@@ -154,31 +160,37 @@ public class Admin extends Thread {
 								//Se registra el tiempo YA
 								//llamar actualizarTP() YA
 								//llamar actualizarTLB() YA
-
+//TODO Borrar Mutex
 	}
 
 	private void actualizarMasVieja(long ref) {
-		synchronized(mutex) {
-			long menor = (long)0;
-			long actual = (long)0;
+		synchronized(memRealRef) {
+			long menor = Long.MAX_VALUE;
 			Set<Long> o = memRealRef.keySet();
 			Iterator<Long> it = o.iterator();
-			for (int i = 0; i < memRealRef.keySet().size(); i++) {
-				actual = it.next();
-				if(actual < menor) {
-					menor = actual;
+			long menorLlave = it.next();
+			long actual = menorLlave;
+			for (int i = 0; i < memRealRef.keySet().size()-1; i++) {
+				long contenido = memRealRef.get(actual);
+				if(contenido < menor) {
+					menor = contenido;
+					menorLlave = actual;
 				}
+				actual = it.next();
 			}
-			memRealRef.remove(menor);
+			memRealRef.remove(menorLlave);
+			actualizarTP(menorLlave, (long)-1);
 			memRealRef.put(ref, ( (long) Math.pow(2,31) ));
 			rbits[(int)ref] = 1;
 		}
 	}
 
 	private void actualizarMemConLLave(long refVieja, long refActual) {
-		synchronized(mutex) {
+		synchronized(memRealRef) {
 			long bits = (long)0;
 			memRealRef.remove(refVieja);
+			actualizarTP(refVieja, (long)-1);
+			bits = bits >> 1;
 			memRealRef.put(refActual, bits +  ( (long) Math.pow(2,31) ));
 			rbits[(int)refActual] = 1;
 		}
@@ -205,7 +217,8 @@ public class Admin extends Thread {
 	}
 
 	private void actualizarMemoria(long ref) {
-		synchronized(mutex) {
+
+		synchronized(memRealRef) {
 			long bits = memRealRef.get(ref);
 			bits = bits >> 1;
 			memRealRef.put(ref, bits +  ( (long) Math.pow(2,31) ));
@@ -242,10 +255,11 @@ public class Admin extends Thread {
         File doc = new File("data/ej_Baja_64paginas.txt");
               Scanner obj = new Scanner(doc);
 
-              while (obj.hasNextLine())
+              while (obj.hasNextLine()) {
                    dato = obj.nextLine();
                    long num = (long) Integer.parseInt(dato);
 				   refPaginas.add(num);
+			  }
 				   
 		obj.close();
                    
@@ -257,10 +271,11 @@ public class Admin extends Thread {
         File doc = new File("data/ej_Alta_64paginas.txt");
               Scanner obj = new Scanner(doc);
 
-              while (obj.hasNextLine())
-                   dato = obj.nextLine();
-                   long num = (long) Integer.parseInt(dato);
-				   refPaginas.add(num);
+              while (obj.hasNextLine()) {
+				dato = obj.nextLine();
+				long num = (long) Integer.parseInt(dato);
+				refPaginas.add(num);
+			  }
 				   
 	    obj.close();
                    
