@@ -31,21 +31,27 @@ public class Main {
         numMP = input.nextInt();
         
         System.out.println("Indique el nombre del archivo con las referencias (Alta o Baja)");
-        nombre_archivo = input.toString();
+        nombre_archivo = input.next();
         
         input.close();
 
         // Creación de estructuras de memoria real, tabla de páginas y TLB
 		Map<Long, Long> memReal = new HashMap<Long, Long>();
-            for(int i = 0; i < numMP; i++){
-                memReal.put((long) -1, (long) 0);
-            }
-            
-		Map<Integer, Integer> TP = new HashMap<Integer, Integer>();
-		int[] TLB = new int[numTLB];
+        for(int i = 0; i < numMP; i++){
+            int j = -1*i;
+            memReal.put((long) j, (long) 0);
+        }
+
+		Map<Long, Long> TP = new HashMap<Long, Long>();
+        for(long i = 0; i < 64; i++){
+            TP.put(i, (long) -1);
+        }
+
+		ArrayList<Long> TLB = new ArrayList<>();
         int num_falloPag = 0;
 
-        Admin admin = new Admin(memReal, TP, TLB, num_falloPag);
+        Object mutex = new Object();
+        Admin admin = new Admin(memReal, TP, TLB, num_falloPag, numTLB, mutex);
         
         // Carga de datos
         
@@ -63,6 +69,7 @@ public class Main {
         	System.out.println(nombre_archivo + " no es una respuesta valida");
         }
 
+        admin.start();
         //se inicializan la memoria real y la TLB
         //admin.crearMemRealTP(numMP);
         //admin.crearTLB(numTLB);
