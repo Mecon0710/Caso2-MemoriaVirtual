@@ -51,7 +51,9 @@ public class Main {
         int num_falloPag = 0;
 
         Object mutex = new Object();
-        Admin admin = new Admin(memReal, TP, TLB, num_falloPag, numTLB, mutex);
+
+        int[] rBits = new int[64];
+        Admin admin = new Admin(memReal, TP, TLB, num_falloPag, numTLB, mutex, rBits);
         
         // Carga de datos
         

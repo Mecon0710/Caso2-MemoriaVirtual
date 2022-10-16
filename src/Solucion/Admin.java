@@ -5,14 +5,11 @@ import java.io.FileWriter;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Date;
-import java.util.HashMap;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 import java.util.Scanner;
 import java.util.Set;
-
-import javax.tools.Diagnostic;
 
 public class Admin extends Thread {
 
@@ -42,6 +39,8 @@ public class Admin extends Thread {
 	private int num_falloPagina;
 
 	private Object mutex;
+
+	private int[] rbits;
 	
 	/**
 	 * -----------------------------------------------------
@@ -49,7 +48,7 @@ public class Admin extends Thread {
 	 * -----------------------------------------------------
 	 */
 	
-	public Admin(Map<Long, Long> memReal, Map<Long, Long> TP, ArrayList<Long> TLB, int falloPag, int numTLB, Object mutex) {
+	public Admin(Map<Long, Long> memReal, Map<Long, Long> TP, ArrayList<Long> TLB, int falloPag, int numTLB, Object mutex, int[] rbits) {
 	
 		Date date = new Date();
 		String fecha = date.toString();
@@ -75,6 +74,7 @@ public class Admin extends Thread {
 		this.refPaginas = new ArrayList<Long>();
 		this.mutex = mutex;
 		this.num_falloPagina = 0;
+		this.rbits = rbits;
 	}
 
 	@Override
@@ -160,6 +160,7 @@ public class Admin extends Thread {
 			}
 			memRealRef.remove(menor);
 			memRealRef.put(ref, ( (long) Math.pow(2,31) ));
+			rbits[(int)ref] = 1;
 		}
 	}
 
@@ -168,6 +169,7 @@ public class Admin extends Thread {
 			long rBits = (long)0;
 			memRealRef.remove(refVieja);
 			memRealRef.put(refActual, rBits +  ( (long) Math.pow(2,31) ));
+			rbits[(int)refActual] = 1;
 		}
 	}
 
@@ -196,6 +198,7 @@ public class Admin extends Thread {
 			long rBits = memRealRef.get(ref);
 			rBits = rBits >> 1;
 			memRealRef.put(ref, rBits +  ( (long) Math.pow(2,31) ));
+			rbits[(int)ref] = 1;
 		}
 	}
 
