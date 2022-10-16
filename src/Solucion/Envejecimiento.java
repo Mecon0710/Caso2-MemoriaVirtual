@@ -1,6 +1,7 @@
 package Solucion;
 
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.HashMap;
 import java.util.Iterator;
 import java.util.Map;
@@ -8,13 +9,15 @@ import java.util.Set;
 import java.lang.Long;
 public class Envejecimiento extends Thread {
 	
-	 private static Map<Long, Long> memRealEnvej;
-
-	private Admin admin;
+	private Map<Long, Long> memRealEnvej;
+	private int[] rBits;
+	private Object mutex;
 	
-	 public Envejecimiento() {
+	 public Envejecimiento(Map<Long, Long> memRealRef, int[] rbits, Object mutex) {
 			
-		 this.memRealEnvej = admin.getMemRealRef();
+		this.memRealEnvej = memRealRef;
+		this.rBits = rbits;
+		this.mutex = mutex;
 		 
 		}
 	//Obtiene la memoria real
@@ -24,14 +27,29 @@ public class Envejecimiento extends Thread {
 		return memRealEnvej;
 	}
 
-	public static void corrimiento(){
+	public void corrimiento(){
+		synchronized (mutex){
 		Set<Long> paginas = memRealEnvej.keySet();
 		Iterator iter = paginas.iterator(); 
 		Long nuevo = (long) 0;
-		
-		for(int i = 0; i < memRealEnvej.size(); i++)
-			nuevo = memRealEnvej.get(iter.next());
-			nuevo = nuevo >> 1;
-			memRealEnvej.replace((Long) iter.next(), nuevo);
-    }
+
+		if (rBits.length != 64){
+			for(int i = 0; i < memRealEnvej.size(); i++){
+				nuevo = memRealEnvej.get(iter.next());
+				nuevo = nuevo >> 1;
+				memRealEnvej.replace((Long) iter.next(), nuevo);
+			}
+		} else {
+			for(int i = 0; i < memRealEnvej.size(); i++){
+				int llave = (int) iter.next();
+
+				if (rBits[llave] == 0){
+					nuevo = memRealEnvej.get((long)llave);
+					nuevo = nuevo >> 1;
+					memRealEnvej.replace((Long) iter.next(), nuevo);
+					}
+				}
+			}
+		}
+	}
 }

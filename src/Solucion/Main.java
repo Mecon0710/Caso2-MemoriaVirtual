@@ -21,6 +21,8 @@ public class Main {
     
 
     public static void main(String[] args) throws Exception{
+
+        //Inputs
     	
     	Scanner input = new Scanner (System.in);
     	
@@ -35,7 +37,8 @@ public class Main {
         
         input.close();
 
-        // Creación de estructuras de memoria real, tabla de páginas y TLB
+        // Creacion de estructuras de memoria real, tabla de paginas y TLB
+
 		Map<Long, Long> memReal = new HashMap<Long, Long>();
         for(int i = 0; i < numMP; i++){
             int j = -1*i;
@@ -48,12 +51,19 @@ public class Main {
         }
 
 		ArrayList<Long> TLB = new ArrayList<>();
+
+        // Creacion de otros elementos
+
         int num_falloPag = 0;
 
         Object mutex = new Object();
 
         int[] rBits = new int[64];
+
+        //Llamado de threads 
+
         Admin admin = new Admin(memReal, TP, TLB, num_falloPag, numTLB, mutex, rBits);
+        Envejecimiento envejecimiento = new Envejecimiento(memReal, rBits, mutex);
         
         // Carga de datos
         
@@ -71,10 +81,11 @@ public class Main {
         	System.out.println(nombre_archivo + " no es una respuesta valida");
         }
 
+        // Inicializacion de threads
+
         admin.start();
-        //se inicializan la memoria real y la TLB
-        //admin.crearMemRealTP(numMP);
-        //admin.crearTLB(numTLB);
+        envejecimiento.start();
+
         
         
     }

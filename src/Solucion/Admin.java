@@ -19,14 +19,17 @@ public class Admin extends Thread {
 	 * -----------------------------------------------------
 	 */
 
-	// estos son los datos ya leídos
+	// Los datos ya leídos
 	private ArrayList<Long> refPaginas;
-	// memoria RAM y R bits
+
+	// Memoria RAM y bits
 	private Map<Long, Long> memRealRef;
-	// Tabla de páginas y TLB
+
+	// Tabla de paginas y TLB
 	private Map<Long, Long> TP;
 	private ArrayList<Long> TLB;
-	//Tamaño de la TLB
+
+	// Tamanio de la TLB
 	private int numTLB;
 
 	// Archivo para el informe
@@ -44,7 +47,7 @@ public class Admin extends Thread {
 	
 	/**
 	 * -----------------------------------------------------
-	 * Métodos
+	 * Metodos
 	 * -----------------------------------------------------
 	 */
 	
@@ -60,8 +63,8 @@ public class Admin extends Thread {
 		}
 		try {
 			logger = new FileWriter("data/log"+ fecha +".txt");
-			logger.append("PaginaReferenciada; TiempoEnProcesar");
-			logger.close();
+			logger.append("TamanioMemoriaReal; TamanioTLB; TiempoEnProcesar; NumeroDeFalloDePaginas \n");
+			
 		} catch (IOException e) {
 			e.printStackTrace();
 		}
@@ -77,31 +80,39 @@ public class Admin extends Thread {
 		this.rbits = rbits;
 	}
 
+	public int[] getRbits() {
+		return rbits;
+	}
+
+	public Map<Long, Long> getMemRealRef() {
+		return memRealRef;
+	}
+
 	@Override
 	public void run() {
 
-		// esto se hace por cada referencia de página en refPaginas cada 2ms
+		// Se hace por cada referencia de pagina en refPaginas cada 2ms
 		for (int i = 0; i < refPaginas.size(); i++) {
 			long refActual = refPaginas.get(i);
 
-			//Si la pagina ya esta se actualiza
+			// Si la pagina ya esta se actualiza
 			if (estaEnTLB(refActual)) {
-				//acumular tiempo de sí está; consultar TLB + RAM
+				// Acumula tiempo de si esta; consultar TLB + RAM
 				tiempoIter += 32;
-				//solo actualizó lo que ya está
+				// Actualiza lo que ya esta
 				actualizarMemoria(refActual);
 			} else {
 				if(estaEnTP(refActual)) {
-					//acumular tiempo de sí está; consultar TP + RAM
+					// Acumula tiempo de si esta; consultar TP + RAM
 					tiempoIter += 60;
 					actualizarTLB(refActual);
-					//solo actualizó lo que ya está
+					// Solo actualiza lo que ya esta
 					actualizarMemoria(refActual);
 				} else {
 					num_falloPagina ++;
-					// acumular tiempo de sí está; no en TP + FALLO
-					tiempoIter += 60 + 1e+7;
-
+					// Acumula tiempo de si esta; no en TP + FALLO
+					tiempoIter += 60 ;
+					tiempoIter += 10000000 ;
 					List<Long> llavesNeg = darLlavesNegativas();
 					if(darLlavesNegativas().size()>0) {
 						long refVieja = llavesNeg.get((int) Math.random() % llavesNeg.size());
@@ -117,7 +128,7 @@ public class Admin extends Thread {
 		}
 
 		try {
-			logger.append(TP.size()+";"+TLB.size()+";"+"\n");
+			logger.append(memRealRef.size()+"; "+numTLB+"; "+ tiempoIter + "; " + num_falloPagina +"\n");
 			logger.close();
 		} catch (IOException e) {
 			e.printStackTrace();
@@ -166,9 +177,9 @@ public class Admin extends Thread {
 
 	private void actualizarMemConLLave(long refVieja, long refActual) {
 		synchronized(mutex) {
-			long rBits = (long)0;
+			long bits = (long)0;
 			memRealRef.remove(refVieja);
-			memRealRef.put(refActual, rBits +  ( (long) Math.pow(2,31) ));
+			memRealRef.put(refActual, bits +  ( (long) Math.pow(2,31) ));
 			rbits[(int)refActual] = 1;
 		}
 	}
@@ -195,9 +206,9 @@ public class Admin extends Thread {
 
 	private void actualizarMemoria(long ref) {
 		synchronized(mutex) {
-			long rBits = memRealRef.get(ref);
-			rBits = rBits >> 1;
-			memRealRef.put(ref, rBits +  ( (long) Math.pow(2,31) ));
+			long bits = memRealRef.get(ref);
+			bits = bits >> 1;
+			memRealRef.put(ref, bits +  ( (long) Math.pow(2,31) ));
 			rbits[(int)ref] = 1;
 		}
 	}
@@ -228,7 +239,7 @@ public class Admin extends Thread {
 	public void cargarDatosBaja() throws Exception {
 		
 		String dato = new String();
-        File doc = new File("data/ej_Baja_64 paginas.txt");
+        File doc = new File("data/ej_Baja_64paginas.txt");
               Scanner obj = new Scanner(doc);
 
               while (obj.hasNextLine())
@@ -243,7 +254,7 @@ public class Admin extends Thread {
 	public void cargarDatosAlta() throws Exception {
 		
 		String dato = new String();
-        File doc = new File("data/ej_Alta_64 paginas.txt");
+        File doc = new File("data/ej_Alta_64paginas.txt");
               Scanner obj = new Scanner(doc);
 
               while (obj.hasNextLine())
