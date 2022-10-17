@@ -169,39 +169,40 @@ public class Admin extends Thread {
 			actualizarTP(menorLlave, (long)-1);
 			removeFromTLB(menorLlave);
 			memRealRef.put(ref, ( (long) Math.pow(2,31) ));
-			rbits[(int)ref] = 1;
+			rbits[(int)ref] = 0;
 		}
 	}
 
 	private void actualizarMemConLLave(long refVieja, long refActual) {
 		synchronized(memRealRef) {
-			long bits = (long)0;
+			//long bits = (long)0;
 			memRealRef.remove(refVieja);
 			//Solo actualiza TP con las direcciones válidas
 			if(refVieja >= 0) {
 				actualizarTP(refVieja, (long)-1);
 				removeFromTLB(refActual);
 			}
-			bits = bits >> 1;
-			memRealRef.put(refActual, bits +  ( (long) Math.pow(2,31) ));
-			rbits[(int)refActual] = 1;
+			//bits = bits >> 1;
+			memRealRef.put(refActual, ( (long) Math.pow(2,31) ));
+			rbits[(int)refActual] = 0;
 		}
 	}
 
 	private List<Long> darLlavesNegativas() {
-		//TODO: revisar si hay que sincronizar
-		List<Long> miListaDeNegativos;
-		miListaDeNegativos = new ArrayList<>();
-		Long numPag = (long)-1;
-		Set<Long> o = memRealRef.keySet();
-		Iterator<Long> it = o.iterator();
-		for (int i = 0; i < memRealRef.keySet().size(); i++) {
-			numPag = it.next();
-			if(numPag < 0) {
-				miListaDeNegativos.add(numPag);
+		synchronized(memRealRef) {
+			List<Long> miListaDeNegativos;
+			miListaDeNegativos = new ArrayList<>();
+			Long numPag = (long)-1;
+			Set<Long> o = memRealRef.keySet();
+			Iterator<Long> it = o.iterator();
+			for (int i = 0; i < memRealRef.keySet().size(); i++) {
+				numPag = it.next();
+				if(numPag < 0) {
+					miListaDeNegativos.add(numPag);
+				}
 			}
+			return miListaDeNegativos;
 		}
-		return miListaDeNegativos;
 	}
 
 	private boolean estaEnTP(long refActual) {
@@ -211,9 +212,9 @@ public class Admin extends Thread {
 	private void actualizarMemoria(long ref) {
 
 		synchronized(memRealRef) {
-			long bits = memRealRef.get(ref);
-			bits = bits >> 1;
-			memRealRef.put(ref, bits +  ( (long) Math.pow(2,31) ));
+			//long bits = memRealRef.get(ref);
+			//bits = bits >> 1;
+			//memRealRef.put(ref, bits +  ( (long) Math.pow(2,31) ));
 			rbits[(int)ref] = 1;
 		}
 	}
@@ -285,7 +286,7 @@ public class Admin extends Thread {
 	public void cargarDatosAlta() throws Exception {
 		
 		String dato = new String();
-        //File doc = new File("data/test2_archivos/test_A_R32_P8.txt");
+        //File doc = new File("data/test2_archivos/test_B_R32_P8.txt");
 		File doc = new File("data/ej_Alta_64paginas.txt");
               Scanner obj = new Scanner(doc);
 
