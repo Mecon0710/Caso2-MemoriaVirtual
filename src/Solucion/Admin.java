@@ -183,8 +183,8 @@ public class Admin extends Thread {
 				removeFromTLB(refActual);
 			}
 			//bits = bits >> 1;
-			memRealRef.put(refActual, ( (long) Math.pow(2,31) ));
-			rbits[(int)refActual] = 0;
+			memRealRef.put(refActual, (long)0);
+			rbits[(int)refActual] = 1;
 		}
 	}
 
