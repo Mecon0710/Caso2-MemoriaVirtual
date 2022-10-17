@@ -1,8 +1,11 @@
 package Solucion;
 
+import java.io.BufferedWriter;
 import java.io.File;
 import java.io.FileWriter;
 import java.io.IOException;
+import java.nio.file.Files;
+import java.nio.file.Path;
 import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
@@ -33,7 +36,7 @@ public class Admin extends Thread {
 
 	// Archivo para el informe
 	private File log;
-	private FileWriter logger;
+	private  BufferedWriter logger;
 
 	// Tiempo total en nanosegundos
 	private long tiempoDirecciones;
@@ -263,10 +266,14 @@ public class Admin extends Thread {
 		log =  new File("data/log-Baja.csv");
 		try {
 			if(log.exists()) {
-				logger = new FileWriter("data/log-Baja.csv");
+				List<String> read = Files.readAllLines(log.toPath());
+				logger = new BufferedWriter(new FileWriter(log));
+				for (int i = 0; i < read.size(); i++) {
+					logger.append(read.get(i) + "\n");
+				}
 			} else {
 				log.createNewFile();
-				logger = new FileWriter("data/log-Baja.csv");
+				logger = new BufferedWriter(new FileWriter(log));
 				logger.append("TamanioMemoriaReal; TamanioTLB; TiempoDirecciones; TiempoDatos; NumeroDeFalloDePaginas \n");
 			}
 		} catch (IOException e) {
@@ -293,10 +300,14 @@ public class Admin extends Thread {
 		log =  new File("data/log-Alta.csv");
 		try {
 			if(log.exists()) {
-				logger = new FileWriter("data/log-Alta.csv");
+				List<String> read = Files.readAllLines(log.toPath());
+				logger = new BufferedWriter(new FileWriter(log));
+				for (int i = 0; i < read.size(); i++) {
+					logger.append(read.get(i) + "\n");
+				}
 			} else {
 				log.createNewFile();
-				logger = new FileWriter("data/log-Alta.csv");
+				logger = new BufferedWriter(new FileWriter(log));
 				logger.append("TamanioMemoriaReal; TamanioTLB; TiempoDirecciones; TiempoDatos; NumeroDeFalloDePaginas \n");
 			}
 		} catch (IOException e) {
