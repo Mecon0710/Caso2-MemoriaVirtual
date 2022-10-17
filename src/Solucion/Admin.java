@@ -4,7 +4,6 @@ import java.io.File;
 import java.io.FileWriter;
 import java.io.IOException;
 import java.util.ArrayList;
-import java.util.Date;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
@@ -37,11 +36,10 @@ public class Admin extends Thread {
 	private FileWriter logger;
 
 	// Tiempo total en nanosegundos
-	private long tiempoIter;
+	private long tiempoDirecciones;
+	private long tiempoDatos;
 
 	private int num_falloPagina;
-
-	private Object mutex;
 
 	private int[] rbits;
 	
@@ -51,33 +49,19 @@ public class Admin extends Thread {
 	 * -----------------------------------------------------
 	 */
 	
-	public Admin(Map<Long, Long> memReal, Map<Long, Long> TP, ArrayList<Long> TLB, int falloPag, int numTLB, Object mutex, int[] rbits) {
-	
-		Date date = new Date();
-		String fecha = date.toString();
-		log =  new File("data/log"+ fecha +".txt");
-		try {
-			log.createNewFile();
-		} catch (IOException e) {
-			e.printStackTrace();
-		}
-		try {
-			logger = new FileWriter("data/log"+ fecha +".txt");
-			logger.append("TamanioMemoriaReal; TamanioTLB; TiempoEnProcesar; NumeroDeFalloDePaginas \n");
-			
-		} catch (IOException e) {
-			e.printStackTrace();
-		}
-		
+	public Admin(Map<Long, Long> memReal, Map<Long, Long> TP, ArrayList<Long> TLB, int falloPag, int numTLB, int[] rbits) {
+
 		this.memRealRef = memReal;
 		this.TP = TP;
 		this.TLB = TLB;
 		this.numTLB = numTLB;
 		this.num_falloPagina = falloPag;
 		this.refPaginas = new ArrayList<Long>();
-		this.mutex = mutex;
 		this.num_falloPagina = 0;
 		this.rbits = rbits;
+
+		this.tiempoDirecciones = 0;
+		this.tiempoDatos = 0;
 	}
 
 	public int[] getRbits() {
@@ -94,25 +78,26 @@ public class Admin extends Thread {
 		// Se hace por cada referencia de pagina en refPaginas cada 2ms
 		for (int i = 0; i < refPaginas.size(); i++) {
 			long refActual = refPaginas.get(i);
-			try {
 				// Si la pagina ya esta se actualiza
 				if (estaEnTLB(refActual)) {
 					// Acumula tiempo de si esta; consultar TLB + RAM
-					tiempoIter += 32;
+					tiempoDirecciones += 2;
+					tiempoDatos += 30;
 					// Actualiza lo que ya esta
 					actualizarMemoria(refActual);
 				} else {
 					if(estaEnTP(refActual)) {
 						// Acumula tiempo de si esta; consultar TP + RAM
-						tiempoIter += 60;
+						tiempoDirecciones += 30;
+						tiempoDatos += 30;
 						actualizarTLB(refActual);
 						// Solo actualiza lo que ya esta
 						actualizarMemoria(refActual);
 					} else {
 						num_falloPagina ++;
 						// Acumula tiempo de si esta; no en TP + FALLO
-						tiempoIter += 60 ;
-						tiempoIter += 10000000 ;
+						tiempoDirecciones += 60;
+						tiempoDatos += 1e+7;
 						List<Long> llavesNeg = darLlavesNegativas();
 						if(darLlavesNegativas().size()>0) {
 							long refVieja = llavesNeg.get((int) Math.random() % llavesNeg.size());
@@ -124,13 +109,10 @@ public class Admin extends Thread {
 						actualizarTLB(refActual);
 					}
 				}
-			} catch(Exception e) {
-				System.out.println("Ref: " + i + " - " + refActual);
-			}
 		}
 
 		try {
-			logger.append(memRealRef.size()+"; "+numTLB+"; "+ tiempoIter + "; " + num_falloPagina +"\n");
+			logger.append(memRealRef.size()+"; "+numTLB+"; "+ tiempoDirecciones + ";"+ tiempoDatos + "; " + num_falloPagina +"\n");
 			logger.close();
 		} catch (IOException e) {
 			e.printStackTrace();
@@ -277,13 +259,27 @@ public class Admin extends Thread {
 			  }
 				   
 		obj.close();
+
+		log =  new File("data/log-Baja.csv");
+		try {
+			if(log.exists()) {
+				logger = new FileWriter("data/log-Baja.csv");
+			} else {
+				log.createNewFile();
+				logger = new FileWriter("data/log-Baja.csv");
+				logger.append("TamanioMemoriaReal; TamanioTLB; TiempoDirecciones; TiempoDatos; NumeroDeFalloDePaginas \n");
+			}
+		} catch (IOException e) {
+			e.printStackTrace();
+		}
                    
 	}
 	
 	public void cargarDatosAlta() throws Exception {
 		
 		String dato = new String();
-        File doc = new File("data/test2_archivos/test_A_R32_P8.txt");
+        //File doc = new File("data/test2_archivos/test_A_R32_P8.txt");
+		File doc = new File("data/ej_Alta_64paginas.txt");
               Scanner obj = new Scanner(doc);
 
               while (obj.hasNextLine()) {
@@ -293,6 +289,19 @@ public class Admin extends Thread {
 			  }
 				   
 	    obj.close();
+
+		log =  new File("data/log-Alta.csv");
+		try {
+			if(log.exists()) {
+				logger = new FileWriter("data/log-Alta.csv");
+			} else {
+				log.createNewFile();
+				logger = new FileWriter("data/log-Alta.csv");
+				logger.append("TamanioMemoriaReal; TamanioTLB; TiempoDirecciones; TiempoDatos; NumeroDeFalloDePaginas \n");
+			}
+		} catch (IOException e) {
+			e.printStackTrace();
+		}
                    
 	}
 

@@ -11,13 +11,11 @@ public class Envejecimiento extends Thread {
 	
 	private Map<Long, Long> memRealEnvej;
 	private int[] rBits;
-	private Object mutex;
 	
-	 public Envejecimiento(Map<Long, Long> memRealRef, int[] rbits, Object mutex) {
+	 public Envejecimiento(Map<Long, Long> memRealRef, int[] rbits) {
 			
 		this.memRealEnvej = memRealRef;
 		this.rBits = rbits;
-		this.mutex = mutex;
 		 
 		}
 	//Obtiene la memoria real
@@ -25,11 +23,13 @@ public class Envejecimiento extends Thread {
 
 	@Override
 	public void run() {
-		corrimiento();
-		try {
-			sleep(1);
-		} catch (InterruptedException e) {
-			e.printStackTrace();
+		while(true) { 
+			corrimiento();
+			try {
+				sleep(1);
+			} catch (InterruptedException e) {
+				e.printStackTrace();
+			}
 		}
 	}
 
@@ -45,7 +45,7 @@ public class Envejecimiento extends Thread {
 					nuevo = nuevo >> 1;
 					memRealEnvej.replace((Long) llave, nuevo);	
 				} 
-				if(llave >= 0 && rBits[(int)llave] == 1) {
+				else if (llave >= 0 && rBits[(int)llave] == 1) {
 					rBits[(int)llave] = 0;
 				}
 			}

@@ -56,14 +56,12 @@ public class Main {
 
         int num_falloPag = 0;
 
-        Object mutex = new Object();
-
         int[] rBits = new int[64];
 
         //Llamado de threads 
 
-        Admin admin = new Admin(memReal, TP, TLB, num_falloPag, numTLB, mutex, rBits);
-        Envejecimiento envejecimiento = new Envejecimiento(memReal, rBits, mutex);
+        Admin admin = new Admin(memReal, TP, TLB, num_falloPag, numTLB, rBits);
+        Envejecimiento envejecimiento = new Envejecimiento(memReal, rBits);
         
         // Carga de datos
         
