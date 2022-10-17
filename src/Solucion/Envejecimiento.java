@@ -26,14 +26,15 @@ public class Envejecimiento extends Thread {
 		while(true) { 
 			corrimiento();
 			try {
-				sleep(1);
-			} catch (InterruptedException e) {
-				e.printStackTrace();
+				Thread.sleep(1);
+			} catch (Exception e) {
+				// TODO: handle exception
 			}
 		}
 	}
 
 	public void corrimiento(){
+		
 		synchronized (memRealEnvej) {
 			Set<Long> paginas = memRealEnvej.keySet();
 			Iterator iter = paginas.iterator(); 
@@ -53,5 +54,10 @@ public class Envejecimiento extends Thread {
 				}
 			}
 		}
+		//try {
+		//	sleep(1);
+		//} catch (InterruptedException e) {
+		//	e.printStackTrace();
+		//}
 	}
 }

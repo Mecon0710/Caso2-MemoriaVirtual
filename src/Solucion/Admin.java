@@ -112,6 +112,11 @@ public class Admin extends Thread {
 						actualizarTLB(refActual);
 					}
 				}
+				try {
+					sleep(2);
+				} catch (InterruptedException e) {
+					e.printStackTrace();
+				}
 		}
 
 		try {
@@ -121,11 +126,7 @@ public class Admin extends Thread {
 			e.printStackTrace();
 		}
 
-		try {
-			sleep(2);
-		} catch (InterruptedException e) {
-			e.printStackTrace();
-		}
+		
 		// 1. Leer referencia de refPaginas YA
 		// 2. Revisa si está en TLB	YA
 			// 2.si: Se registra el tiempo de acceso a la TLB	YA	
@@ -148,6 +149,7 @@ public class Admin extends Thread {
 								//llamar actualizarTP() YA
 								//llamar actualizarTLB() YA
 //TODO Borrar Mutex
+		
 	}
 
 	private void actualizarMasVieja(long ref) {
@@ -253,7 +255,8 @@ public class Admin extends Thread {
 	public void cargarDatosBaja() throws Exception {
 		
 		String dato = new String();
-        File doc = new File("data/ej_Baja_64paginas.txt");
+        //File doc = new File("data/test2_archivos/test_A2_R32_P8.txt");
+		File doc = new File("data/ej_Baja_64paginas.txt");
               Scanner obj = new Scanner(doc);
 
               while (obj.hasNextLine()) {
