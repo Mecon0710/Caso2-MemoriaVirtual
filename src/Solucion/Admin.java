@@ -94,37 +94,39 @@ public class Admin extends Thread {
 		// Se hace por cada referencia de pagina en refPaginas cada 2ms
 		for (int i = 0; i < refPaginas.size(); i++) {
 			long refActual = refPaginas.get(i);
-
-			// Si la pagina ya esta se actualiza
-			if (estaEnTLB(refActual)) {
-				// Acumula tiempo de si esta; consultar TLB + RAM
-				tiempoIter += 32;
-				// Actualiza lo que ya esta
-				actualizarMemoria(refActual);
-			} else {
-				if(estaEnTP(refActual)) {
-					// Acumula tiempo de si esta; consultar TP + RAM
-					tiempoIter += 60;
-					actualizarTLB(refActual);
-					// Solo actualiza lo que ya esta
+			try {
+				// Si la pagina ya esta se actualiza
+				if (estaEnTLB(refActual)) {
+					// Acumula tiempo de si esta; consultar TLB + RAM
+					tiempoIter += 32;
+					// Actualiza lo que ya esta
 					actualizarMemoria(refActual);
 				} else {
-					num_falloPagina ++;
-					// Acumula tiempo de si esta; no en TP + FALLO
-					tiempoIter += 60 ;
-					tiempoIter += 10000000 ;
-					List<Long> llavesNeg = darLlavesNegativas();
-					if(darLlavesNegativas().size()>0) {
-						long refVieja = llavesNeg.get((int) Math.random() % llavesNeg.size());
-						actualizarMemConLLave(refVieja, refActual);
+					if(estaEnTP(refActual)) {
+						// Acumula tiempo de si esta; consultar TP + RAM
+						tiempoIter += 60;
+						actualizarTLB(refActual);
+						// Solo actualiza lo que ya esta
+						actualizarMemoria(refActual);
 					} else {
-						actualizarMasVieja(refActual);
+						num_falloPagina ++;
+						// Acumula tiempo de si esta; no en TP + FALLO
+						tiempoIter += 60 ;
+						tiempoIter += 10000000 ;
+						List<Long> llavesNeg = darLlavesNegativas();
+						if(darLlavesNegativas().size()>0) {
+							long refVieja = llavesNeg.get((int) Math.random() % llavesNeg.size());
+							actualizarMemConLLave(refVieja, refActual);
+						} else {
+							actualizarMasVieja(refActual);
+						}
+						actualizarTP(refActual, refActual);
+						actualizarTLB(refActual);
 					}
-					actualizarTP(refActual, refActual);
-					actualizarTLB(refActual);
 				}
+			} catch(Exception e) {
+				System.out.println("Ref: " + i + " - " + refActual);
 			}
-
 		}
 
 		try {
@@ -180,6 +182,7 @@ public class Admin extends Thread {
 			}
 			memRealRef.remove(menorLlave);
 			actualizarTP(menorLlave, (long)-1);
+			removeFromTLB(menorLlave);
 			memRealRef.put(ref, ( (long) Math.pow(2,31) ));
 			rbits[(int)ref] = 1;
 		}
@@ -189,7 +192,11 @@ public class Admin extends Thread {
 		synchronized(memRealRef) {
 			long bits = (long)0;
 			memRealRef.remove(refVieja);
-			actualizarTP(refVieja, (long)-1);
+			//Solo actualiza TP con las direcciones válidas
+			if(refVieja >= 0) {
+				actualizarTP(refVieja, (long)-1);
+				removeFromTLB(refActual);
+			}
 			bits = bits >> 1;
 			memRealRef.put(refActual, bits +  ( (long) Math.pow(2,31) ));
 			rbits[(int)refActual] = 1;
@@ -235,6 +242,14 @@ public class Admin extends Thread {
 		return false;
 	}
 
+	public void removeFromTLB(long ref) {
+		for (int i = 0; i < TLB.size(); i++) {
+			if (TLB.get(i) == ref) {
+				TLB.remove(i);
+			}
+		}
+	}
+
 	public void actualizarTLB(long ref) {
 
 		if(TLB.size()<numTLB) {
@@ -268,7 +283,7 @@ public class Admin extends Thread {
 	public void cargarDatosAlta() throws Exception {
 		
 		String dato = new String();
-        File doc = new File("data/ej_Alta_64paginas.txt");
+        File doc = new File("data/test2_archivos/test_A_R32_P8.txt");
               Scanner obj = new Scanner(doc);
 
               while (obj.hasNextLine()) {

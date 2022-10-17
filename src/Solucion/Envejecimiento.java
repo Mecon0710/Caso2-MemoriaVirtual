@@ -43,7 +43,10 @@ public class Envejecimiento extends Thread {
 				if (llave >= 0 && rBits[(int)llave] == 0){
 					nuevo = memRealEnvej.get((long)llave);
 					nuevo = nuevo >> 1;
-					memRealEnvej.replace((Long) llave, nuevo);
+					memRealEnvej.replace((Long) llave, nuevo);	
+				} 
+				if(llave >= 0 && rBits[(int)llave] == 1) {
+					rBits[(int)llave] = 0;
 				}
 			}
 		}
