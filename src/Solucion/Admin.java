@@ -5,7 +5,6 @@ import java.io.File;
 import java.io.FileWriter;
 import java.io.IOException;
 import java.nio.file.Files;
-import java.nio.file.Path;
 import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
@@ -21,10 +20,10 @@ public class Admin extends Thread {
 	 * -----------------------------------------------------
 	 */
 
-	// Los datos ya leídos
+	// Los datos ya leidos
 	private ArrayList<Long> refPaginas;
 
-	// Memoria RAM y bits
+	// Memoria RAM = paginas y bits
 	private Map<Long, Long> memRealRef;
 
 	// Tabla de paginas y TLB
@@ -34,7 +33,7 @@ public class Admin extends Thread {
 	// Tamanio de la TLB
 	private int numTLB;
 
-	// Archivo para el informe
+	// Datos para el informe
 	private File log;
 	private  BufferedWriter logger;
 
@@ -42,8 +41,10 @@ public class Admin extends Thread {
 	private long tiempoDirecciones;
 	private long tiempoDatos;
 
+	// Numero de fallos de pagina
 	private int num_falloPagina;
 
+	// Indica que paginas fueron referenciadas 
 	private int[] rbits;
 	
 	/**
@@ -67,21 +68,13 @@ public class Admin extends Thread {
 		this.tiempoDatos = 0;
 	}
 
-	public int[] getRbits() {
-		return rbits;
-	}
-
-	public Map<Long, Long> getMemRealRef() {
-		return memRealRef;
-	}
-
 	@Override
 	public void run() {
 
 		// Se hace por cada referencia de pagina en refPaginas cada 2ms
 		for (int i = 0; i < refPaginas.size(); i++) {
 			long refActual = refPaginas.get(i);
-				// Si la pagina ya esta se actualiza
+				
 				if (estaEnTLB(refActual)) {
 					// Acumula tiempo de si esta; consultar TLB + RAM
 					tiempoDirecciones += 2;
@@ -89,6 +82,7 @@ public class Admin extends Thread {
 					// Actualiza lo que ya esta
 					actualizarMemoria(refActual);
 				} else {
+
 					if(estaEnTP(refActual)) {
 						// Acumula tiempo de si esta; consultar TP + RAM
 						tiempoDirecciones += 30;
@@ -98,10 +92,11 @@ public class Admin extends Thread {
 						actualizarMemoria(refActual);
 					} else {
 						num_falloPagina ++;
-						// Acumula tiempo de si esta; no en TP + FALLO
+						// Acumula tiempo de si esta; FALLO + resolucion FALLO
 						tiempoDirecciones += 60;
 						tiempoDatos += 1e+7;
 						List<Long> llavesNeg = darLlavesNegativas();
+
 						if(darLlavesNegativas().size()>0) {
 							long refVieja = llavesNeg.get((int) Math.random() % llavesNeg.size());
 							actualizarMemConLLave(refVieja, refActual);
@@ -125,30 +120,6 @@ public class Admin extends Thread {
 		} catch (IOException e) {
 			e.printStackTrace();
 		}
-
-		
-		// 1. Leer referencia de refPaginas YA
-		// 2. Revisa si está en TLB	YA
-			// 2.si: Se registra el tiempo de acceso a la TLB	YA	
-				//Se hace la referencia a esa pag	YA
-			// 2.no:	YA
-				// 3. Revisa si está en la TP   YA
-					// 3.si: Se registra el tiempo de acceso usando TP YA
-							//llamar actualizarTLB() YA
-							//Se hace la referencia a esa pag YA
-					// 3.no: Aquí hay fallo de página. YA
-						// 4. Se accede a la memoria real y se revisa si está llena YA
-							//4.hayEspacio: se coje uno al azar se remplaza por la página  YA
-								//Se pone en el espacio y se pone todo en 0000... luego se pone el 1 al inicio YA
-								//Se registra el tiempo YA
-								//llamar actualizarTP() YA
-								//llamar actualizarTLB() YA
-							//4.llena: se coje el más viejo y se elimina, se remplaza por la página y ponemos el 1 a la izquierda YA
-								//Se coje el más viejo, y remplaza todo por 0000...luego se pone el 1 al inicio YA
-								//Se registra el tiempo YA
-								//llamar actualizarTP() YA
-								//llamar actualizarTLB() YA
-//TODO Borrar Mutex
 		
 	}
 
@@ -214,9 +185,6 @@ public class Admin extends Thread {
 	private void actualizarMemoria(long ref) {
 
 		synchronized(memRealRef) {
-			//long bits = memRealRef.get(ref);
-			//bits = bits >> 1;
-			//memRealRef.put(ref, bits +  ( (long) Math.pow(2,31) ));
 			rbits[(int)ref] = 1;
 		}
 	}
@@ -255,7 +223,6 @@ public class Admin extends Thread {
 	public void cargarDatosBaja() throws Exception {
 		
 		String dato = new String();
-        //File doc = new File("data/test2_archivos/test_A2_R32_P8.txt");
 		File doc = new File("data/ej_Baja_64paginas.txt");
               Scanner obj = new Scanner(doc);
 
@@ -289,7 +256,6 @@ public class Admin extends Thread {
 	public void cargarDatosAlta() throws Exception {
 		
 		String dato = new String();
-        //File doc = new File("data/test2_archivos/test_B_R32_P8.txt");
 		File doc = new File("data/ej_Alta_64paginas.txt");
               Scanner obj = new Scanner(doc);
 

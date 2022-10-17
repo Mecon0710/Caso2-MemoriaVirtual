@@ -6,15 +6,7 @@ import java.util.Map;
 import java.util.Scanner;
 
 public class Main {
-
-    //Tiempos
-    private final static int T_TLB = 2;
-    private final static int T_TP = 30;
-    private final static int T_DATOS_RAM = 30;
-    private final static int T_FALLA_PAG = 60;
-    private final static int T_SOL_FALLA_PAG = 10;
-    
-    
+     
     private static int numTLB;
     private static int numMP;
     private static String nombre_archivo;

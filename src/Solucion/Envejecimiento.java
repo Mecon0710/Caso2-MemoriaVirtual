@@ -1,8 +1,5 @@
 package Solucion;
 
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.HashMap;
 import java.util.Iterator;
 import java.util.Map;
 import java.util.Set;
@@ -18,8 +15,6 @@ public class Envejecimiento extends Thread {
 		this.rBits = rbits;
 		 
 		}
-	//Obtiene la memoria real
-	//Hace el corrimiento de todas las paginas que hay en memoria real (marcos)
 
 	@Override
 	public void run() {
@@ -28,7 +23,6 @@ public class Envejecimiento extends Thread {
 			try {
 				Thread.sleep(1);
 			} catch (Exception e) {
-				// TODO: handle exception
 			}
 		}
 	}
@@ -43,7 +37,7 @@ public class Envejecimiento extends Thread {
 				long llave = (long) iter.next();
 				if (llave >= 0 && rBits[(int)llave] == 0){
 					nuevo = memRealEnvej.get((long)llave);
-					nuevo = nuevo >> 1;
+					nuevo = nuevo >> 1; 
 					memRealEnvej.replace((Long) llave, nuevo);	
 				} 
 				else if (llave >= 0 && rBits[(int)llave] == 1) {
@@ -54,10 +48,6 @@ public class Envejecimiento extends Thread {
 				}
 			}
 		}
-		//try {
-		//	sleep(1);
-		//} catch (InterruptedException e) {
-		//	e.printStackTrace();
-		//}
+
 	}
 }
